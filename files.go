@@ -85,3 +85,39 @@ func (a *OpenAI) DeleteFile(fileId string) (*FileDeleted, error) {
 
 	return res, nil
 }
+
+func (a *OpenAI) RetrieveFile(fileId string) (*File, error) {
+	file := &File{}
+	req, err := a.NewRequest(
+		http.MethodGet,
+		a.getUrl(fmt.Sprintf("files/%s", fileId)),
+		nil,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	if err = a.Send(req, file); err != nil {
+		return nil, err
+	}
+
+	return file, nil
+}
+
+func (a *OpenAI) RetrieveFileContent(fileId string) (string, error) {
+	res := ""
+	req, err := a.NewRequest(
+		http.MethodGet,
+		a.getUrl(fmt.Sprintf("files/%s/content", fileId)),
+		nil,
+	)
+	if err != nil {
+		return "", err
+	}
+
+	if err = a.Send(req, &res); err != nil {
+		return "", err
+	}
+
+	return res, nil
+}

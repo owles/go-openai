@@ -124,11 +124,20 @@ func (a *OpenAI) Send(req *http.Request, v interface{}) error {
 
 	if resp.StatusCode != http.StatusOK {
 		var errResp ErrorResponse
+
 		if err := json.NewDecoder(resp.Body).Decode(&errResp); err == nil {
 			return errors.New(errResp.Error.Message)
 		}
 
 		return errors.New(resp.Status)
+	}
+
+	if reflect.ValueOf(v).Elem().Kind() == reflect.String {
+		if buf, err := io.ReadAll(resp.Body); err == nil {
+			rv := reflect.ValueOf(v)
+			rv.Elem().SetString(string(buf))
+			return nil
+		}
 	}
 
 	return json.NewDecoder(resp.Body).Decode(v)
