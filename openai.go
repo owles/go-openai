@@ -10,6 +10,7 @@ import (
 	"mime/multipart"
 	"net/http"
 	"os"
+	"path"
 	"reflect"
 )
 
@@ -74,7 +75,7 @@ func (a *OpenAI) NewFormRequest(method, url string, v reflect.Value) (*http.Requ
 		if val.IsValid() && !val.IsZero() {
 			tag := field.Tag.Get("form")
 			if field.Type.Kind() == reflect.Ptr {
-				part, _ := writer.CreateFormFile(tag, val.Interface().(*os.File).Name())
+				part, _ := writer.CreateFormFile(tag, path.Base(val.Interface().(*os.File).Name()))
 				io.Copy(part, val.Interface().(*os.File))
 			}
 			if field.Type.Kind() == reflect.Int {
